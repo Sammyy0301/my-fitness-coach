@@ -1,0 +1,11 @@
+{
+  "name": "My Fitness Coach",
+  "short_name": "Fitness Coach",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7fb",
+  "theme_color": "#0f172a",
+  "description": "Personal cricket and fitness coach"
+}

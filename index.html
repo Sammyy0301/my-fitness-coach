@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
 <title>My Fitness Coach v0.3</title>
 <style>
 :root{--bg:#f5f7fb;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--soft:#eef2ff}
@@ -87,6 +89,7 @@ small{color:var(--muted)}.choice{display:flex;gap:7px;flex-wrap:wrap}.choice but
 <nav><button onclick="show('home')">🏠</button><button onclick="show('train')">🏋️</button><button onclick="show('hydration')">💧</button><button onclick="show('food')">🍛</button><button onclick="show('progress')">📈</button></nav>
 
 <script>
+if ("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
 const day=new Date().getDay(), academy=[1,2,3].includes(day);
 const plans={
 1:{t:"Cricket + Activation",tag:"HIGH LOAD",d:"Academy day. Keep extra training short and technical.",type:"activation"},
