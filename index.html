@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>My Fitness Coach v0.3</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--soft:#eef2ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:#0f172a;color:white;padding:22px 18px 20px;border-radius:0 0 26px 26px}.wrap{max-width:720px;margin:auto}
+main{padding:14px 14px 95px}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.muted{color:var(--muted)}h1,h2,h3{margin:0 0 8px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{padding:14px;background:var(--soft);border-radius:16px}.pill{font-size:12px;font-weight:800;padding:6px 9px;border-radius:99px;background:#ecfdf5;color:#065f46}
+button{border:0;border-radius:13px;padding:11px 14px;background:#0f172a;color:white;font-weight:800}.secondary{background:#e2e8f0;color:#0f172a}
+button:disabled{opacity:.45}.exercise{border:1px solid var(--line);padding:12px;border-radius:15px;margin:9px 0}.done{opacity:.55}
+.progress{height:9px;background:#e2e8f0;border-radius:99px;overflow:hidden}.fill{height:100%;width:0;background:#0f172a}
+.timer{text-align:center;font-size:48px;font-weight:900;margin:12px}.big{font-size:28px;font-weight:900}
+select,input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:11px;margin:5px 0 12px;background:#fff}
+nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--line);display:flex;justify-content:center;gap:4px;padding:9px;z-index:10}
+nav button{background:transparent;color:#0f172a;padding:9px 10px}section{display:none}section.active{display:block}
+.notice{background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:12px}.success{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:14px;padding:12px}
+small{color:var(--muted)}.choice{display:flex;gap:7px;flex-wrap:wrap}.choice button{flex:1;min-width:110px}.choice .selected{outline:3px solid #c7d2fe}
+</style>
+</head>
+<body>
+<header><div class="wrap"><small style="color:#cbd5e1">PERSONAL ATHLETE COACH</small><h1>🏏 My Fitness Coach</h1><div id="date"></div></div></header>
+<main class="wrap">
+
+<section id="home" class="active">
+<div class="card">
+<div class="row"><div><small>TODAY'S COACHING</small><h2 id="title"></h2></div><span id="tag" class="pill"></span></div>
+<p id="description"></p><div class="progress"><div id="fill" class="fill"></div></div><small id="pct">0% complete</small>
+</div>
+<div class="card">
+<h3>🧠 Readiness check</h3><p class="muted">This helps decide how hard today's session should be.</p>
+<div class="choice" id="readiness">
+<button onclick="setReadiness('fresh')">⚡ Fresh</button><button onclick="setReadiness('normal')">🙂 Normal</button><button onclick="setReadiness('tired')">😴 Tired</button><button onclick="setReadiness('sore')">🦵 Sore</button>
+</div><p id="readinessMsg" class="muted"></p>
+</div>
+<div class="grid">
+<div class="box"><b>⏰ Free window</b><br><span id="window"></span></div>
+<div class="box"><b>🏏 Training load</b><br><span id="trainingLoad"></span></div>
+<div class="box"><b>💧 Hydration</b><br><span id="waterCount">0</span> check-ins</div>
+<div class="box"><b>🔥 Sessions</b><br><span id="sessionCount">0</span></div>
+</div>
+<div class="card"><h3>Today's timetable</h3><div id="schedule"></div></div>
+<div class="card notice"><b>Safety first</b><br>Stop exercise for pain, dizziness, chest pain, breathing trouble, or feeling unwell. For a young athlete, a parent/guardian and qualified coach should guide individualized training.</div>
+</section>
+
+<section id="train">
+<div class="card"><small>SESSION</small><div class="row"><h2 id="sessionTitle"></h2><span class="pill" id="duration"></span></div><p id="sessionNote"></p></div>
+<div class="card"><h3>🏋️ Workout</h3><div id="exerciseList"></div></div>
+<div class="card">
+<h3>⏱️ Rest timer</h3><div class="timer" id="timer">00:30</div>
+<div class="row"><button onclick="startTimer()">Start</button><button class="secondary" onclick="resetTimer()">Reset</button></div>
+</div>
+</section>
+
+<section id="hydration">
+<div class="card"><small>DAILY HABIT</small><h2>💧 Hydration check-in</h2>
+<p>Use this as a simple reminder rather than a strict target.</p>
+<div class="big"><span id="waterBig">0</span> check-ins</div><br>
+<button onclick="addWater()">+ Water</button> <button class="secondary" onclick="resetWater()">Reset today</button>
+<p class="muted">On hot/hard cricket days, drink regularly and follow your coach's guidance. Don't force excessive water.</p>
+</div>
+</section>
+
+<section id="food">
+<div class="card"><small>FUEL & RECOVERY</small><h2>🍛 Food coach</h2>
+<p>No calorie counting. The app focuses on regular meals, adequate food for growth/training, carbohydrates for activity, protein-containing foods, fruit/vegetables and fluids.</p>
+<h3>🌅 Breakfast</h3><p>Choose a normal home breakfast such as poha/upma + curd, eggs + roti, oats + milk + fruit, or another balanced option.</p>
+<h3>🏫 School</h3><p>Carry practical food: fruit, milk/curd, nuts, homemade sandwich, or another family-approved snack.</p>
+<h3>🏏 Before cricket</h3><p>If hungry before training, choose an easy-to-digest carbohydrate-rich snack such as banana, fruit, sandwich or poha plus water.</p>
+<h3>🥛 After training</h3><p>Have a normal meal/snack containing carbohydrate + a protein source + fluids.</p>
+<h3>🍽️ Dinner</h3><p>Eat your normal family meal. The app is not intended to restrict food.</p>
+</div>
+</section>
+
+<section id="progress">
+<div class="card"><small>YOUR TREND</small><h2>📈 Progress</h2><div class="grid"><div class="box"><b id="sessions">0</b><br><small>completed sessions</small></div><div class="box"><b id="logs">0</b><br><small>readiness logs</small></div></div></div>
+<div class="card"><h3>Weekly focus</h3><p>🏃 Speed quality</p><p>💪 Strength technique</p><p>🫁 Stamina</p><p>🧘 Mobility</p><p>😴 Recovery</p></div>
+<div class="card"><h3>Today's log</h3><label>Energy 1–5</label><input id="energy" type="number" min="1" max="5" placeholder="1–5"><label>Workout quality 1–5</label><input id="quality" type="number" min="1" max="5" placeholder="1–5"><button onclick="saveLog()">Save</button><p id="saved" class="muted"></p></div>
+</section>
+
+</main>
+<nav><button onclick="show('home')">🏠</button><button onclick="show('train')">🏋️</button><button onclick="show('hydration')">💧</button><button onclick="show('food')">🍛</button><button onclick="show('progress')">📈</button></nav>
+
+<script>
+const day=new Date().getDay(), academy=[1,2,3].includes(day);
+const plans={
+1:{t:"Cricket + Activation",tag:"HIGH LOAD",d:"Academy day. Keep extra training short and technical.",type:"activation"},
+2:{t:"Cricket + Activation",tag:"HIGH LOAD",d:"Academy day. Avoid piling hard leg work on top.",type:"activation"},
+3:{t:"Cricket + Recovery",tag:"HIGH LOAD",d:"After three academy days, protect recovery.",type:"recovery"},
+4:{t:"Strength Builder",tag:"BUILD",d:"A main strength opportunity around your tuition schedule.",type:"strength"},
+5:{t:"Speed + Agility",tag:"FAST",d:"Quality speed and movement session. Technique comes first.",type:"speed"},
+6:{t:"Athletic Conditioning",tag:"BUILD",d:"Full-body athletic session using the ground and band.",type:"conditioning"},
+0:{t:"Recovery + Mobility",tag:"RECOVER",d:"Easy movement and recovery so you are ready for the next week.",type:"recovery"}};
+const workouts={
+activation:[["Band pull-aparts","2 × 12"],["World's greatest stretch","1 × 5/side"],["Glute bridge","2 × 10"],["Dead bug","2 × 6/side"]],
+recovery:[["Easy walk","10 min"],["Hip mobility","5 min"],["Thoracic rotations","1 × 6/side"],["Calf/hamstring mobility","5 min"]],
+strength:[["Bodyweight squat","3 × 8"],["Resistance-band row","3 × 10"],["Push-ups","3 × 6–10"],["Band Romanian deadlift","3 × 10"],["Dead bug","3 × 6/side"]],
+speed:[["Dynamic warm-up","8 min"],["Acceleration sprints","5 × 15 m"],["Shuttle/change of direction","4 × 20 m"],["Light hops","2 × 15"],["Easy walk cooldown","5 min"]],
+conditioning:[["Warm-up jog + mobility","8 min"],["Squat to calf raise","3 × 10"],["Band row","3 × 12"],["Walking lunges","2 × 8/side"],["Plank","3 × 20–30 sec"],["Easy intervals","6 × 30 sec / 60 sec walk"]]};
+let p=plans[day], currentReadiness=localStorage.getItem("readiness_"+new Date().toDateString())||"normal";
+date.textContent=new Date().toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});
+title.textContent=p.t;tag.textContent=p.tag;description.textContent=p.d;trainingLoad.textContent=p.tag;
+window.textContent=academy?"10–15 min morning":"20–35 min morning/afternoon";
+schedule.innerHTML=`<p>🌅 6:00 — Wake + mobility</p><p>🏫 7:00–3:00 — School</p><p>${academy?"🏏 3:30–6:30 — Cricket academy":"📚 5:00–7:00 — Tuition"}</p><p>📚 Study + dinner + wind-down</p>`;
+sessionTitle.textContent=p.t;sessionNote.textContent=p.d;duration.textContent=p.type==="speed"?"25–30 min":p.type==="strength"?"30–35 min":"10–25 min";
+function setReadiness(v){currentReadiness=v;localStorage.setItem("readiness_"+new Date().toDateString(),v);let m={fresh:"Follow the planned session if technique feels good.",normal:"Normal plan. Keep good technique and don't chase exhaustion.",tired:"Reduce volume and keep intensity comfortable today.",sore:"Prefer recovery/mobility. Avoid hard sprinting or loading a painful area."};readinessMsg.textContent=m[v];document.querySelectorAll("#readiness button").forEach(b=>b.classList.remove("selected"));event.target.classList.add("selected");}
+setReadiness(currentReadiness);
+function getWorkout(){let arr=[...workouts[p.type]];if(currentReadiness==="tired")arr=arr.slice(0,Math.max(2,Math.ceil(arr.length*.6)));if(currentReadiness==="sore")arr=workouts.recovery;return arr}
+function render(){let arr=getWorkout(),done=JSON.parse(localStorage.getItem("done_"+day)||"[]");exerciseList.innerHTML=arr.map((x,i)=>`<div class="exercise ${done[i]?'done':''}"><div class="row"><div><b>${x[0]}</b><br><small>${x[1]}</small></div><button onclick="complete(${i})">${done[i]?'✓ Done':'Complete'}</button></div></div>`).join("");let n=done.filter(Boolean).length;fill.style.width=(n/arr.length*100)+"%";pct.textContent=Math.round(n/arr.length*100)+"% complete";update();}
+function complete(i){let arr=getWorkout(),s=JSON.parse(localStorage.getItem("done_"+day)||"[]");s[i]=!s[i];localStorage.setItem("done_"+day,JSON.stringify(s));if(s.filter(Boolean).length===arr.length)localStorage.setItem("sessions",+(localStorage.getItem("sessions")||0)+1);render()}
+let interval;function startTimer(){clearInterval(interval);let n=30;timer.textContent="00:30";interval=setInterval(()=>{n--;timer.textContent="00:"+String(n).padStart(2,"0");if(n<=0){clearInterval(interval);navigator.vibrate?.(300);timer.textContent="REST!"}},1000)}
+function resetTimer(){clearInterval(interval);timer.textContent="00:30"}
+function addWater(){let k="water_"+new Date().toDateString(),n=+(localStorage.getItem(k)||0)+1;localStorage.setItem(k,n);update()}
+function resetWater(){localStorage.removeItem("water_"+new Date().toDateString());update()}
+function saveLog(){let k="log_"+new Date().toDateString();localStorage.setItem(k,JSON.stringify({energy:energy.value,quality:quality.value}));saved.textContent="Saved on this device.";update()}
+function update(){let done=JSON.parse(localStorage.getItem("done_"+day)||"[]"),arr=getWorkout();fill.style.width=(done.filter(Boolean).length/arr.length*100)+"%";pct.textContent=Math.round(done.filter(Boolean).length/arr.length*100)+"% complete";waterCount.textContent=localStorage.getItem("water_"+new Date().toDateString())||0;waterBig.textContent=localStorage.getItem("water_"+new Date().toDateString())||0;sessionCount.textContent=localStorage.getItem("sessions")||0;sessions.textContent=localStorage.getItem("sessions")||0;logs.textContent=Object.keys(localStorage).filter(x=>x.startsWith("log_")).length}
+function show(id){document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active")}
+render();update();
+</script>
+</body>
+</html>
